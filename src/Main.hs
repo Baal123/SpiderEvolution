@@ -4,11 +4,8 @@ import           Graphics.Gloss
 import           Graphics.Gloss.Juicy
 import           Simulation
 import           SimulationState
+import Utilities
 
-mapWithIndex = go 0
-               where
-                go i f []     = []
-                go i f (x:xs) = f i x:go (i+1) f xs
 
 width = 600
 height = 600
@@ -54,7 +51,7 @@ main = do wall <- wallP
           startSim (loadSprites wall spiderD spiderT spiderL spiderR)
 
 startSim info
-  = simulate window background fps initialState (render info) update
+  = simulate window background fps (StateWithTime 0 initialState) (render info) update
 
 
 update :: a -> Float -> StateWithTime -> StateWithTime

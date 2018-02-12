@@ -7,12 +7,15 @@ module SimulationState(Orientation(..),
                        getField,
                        toInt,
                        StateWithTime(..),
-                       addTime) where
-data Orientation = Top | ToLeft | Bot | ToRight deriving(Show)
+                       addTime,
+                       spiderPosition,
+                       goalPosition) where
+import Utilities
+data Orientation = Top | ToLeft | Bot | ToRight deriving(Show, Eq, Ord)
 
 type Position = (Int, Int, Orientation)
 
-data Field = Empty | Wall | Goal deriving(Show)
+data Field = Empty | Wall | Goal deriving(Show, Eq, Ord)
 toInt Empty = 0
 toInt Wall = -1
 toInt Goal = 1
@@ -21,20 +24,22 @@ fromInt (-1) = Wall
 fromInt 1 = Goal
 
 -- Rows are rows (horizontal)
-data World = World [[Field]] Int Int deriving(Show)
+data World = World [[Field]] Int Int deriving(Show, Eq, Ord)
 
 getField (World field xSize ySize) x y
     | 0 <= x && x < xSize && 0 <= y && y < ySize = (field!!y)!!x
     | otherwise = Wall
 
-
-
-data StateWithTime = StateWithTime Float SimState deriving(Show)
+data StateWithTime = StateWithTime Float SimState deriving(Show, Eq, Ord)
 addTime t (StateWithTime t' g) = StateWithTime (t+t') g
 
-data SimState = SimState World Position deriving(Show)
+data SimState = SimState World Position deriving(Show, Eq, Ord)
+spiderPosition (SimState _ (x,y,_)) = (fromIntegral x, fromIntegral y)
+goalPosition (SimState (World rows _ _) _ ) = let fields = concat $ mapWithIndex (\i row -> (mapWithIndex (\j cell -> ((i, j), cell)) row)) rows
+                                                  (x, y) = fst . head $ filter (\x -> snd x == Goal) fields
+                                                  in (fromIntegral x, fromIntegral y)
 
-initialState = StateWithTime 0 $ SimState standardWorld startPosition
+initialState = SimState standardWorld startPosition
 startPosition = (xSize - 7, ySize - 7, ToRight)
 standardWorld = World field xSize ySize
 field = [wall xSize,

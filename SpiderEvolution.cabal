@@ -61,7 +61,8 @@ executable SpiderEvolution
                        gloss >= 1.8,
                        matrix,
                        gloss-juicy >= 0.2.2,
-                       NoTrace
+                       NoTrace,
+                       random >= 1.1
 
   -- Directories containing source files.
   hs-source-dirs:      src

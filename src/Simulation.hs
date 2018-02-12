@@ -1,12 +1,13 @@
 module Simulation(simulateWorld,
-                  defaultSpider) where
-import           Data.Matrix(multStd, fromList, toList)
+                  defaultSpider,
+                  Spider,
+                  simulateSteps) where
+import           Data.Matrix     (fromList, multStd, toList)
+import           Debug.NoTrace
 import           SimulationState
-import Debug.NoTrace
 
 data Action = TurnLeft | TurnRight | Move deriving(Show)
 reach = 6
-simSpeed = 10 -- Sims per second
 
 type View = [Field]
 view :: World -> Position -> View
@@ -21,6 +22,11 @@ view world (x, y, ToRight)
 
 -- Size of spider is 3 * 3 * reach, i.e.: 54
 type Spider = [Double]
+defaultSpider :: Spider
+defaultSpider
+  = [3.443963592762389e-2,0.6907643025251275,0.8297200881728026,0.9494911992637026,0.5909051346161961,0.8425734526058662,0.8366972387232299,0.44478564800016984,0.42618211390084326,0.6292167821622076,0.7271515547532703,0.3476520747563968,0.6660994689983872,0.4277448629147902,0.4520070073601449,0.2667591922508532,0.9080438468053574,0.869365246573231,0.6686071052409718,1.1183321512033162e-2,0.9761638974389767,0.6683129203298172,0.39698692845990824,0.6257730062136024,0.9056320349178099,0.39421210059635936,0.19702139302021449,0.17384679399508007,0.3446159247977868,0.9639774160767659,0.9953784876884751,0.7131910668658339,0.28292863511118593,0.2087154027799717,0.7453886943826094,0.8587795789616688,0.8668592736882477,8.235528423680505e-2,0.5284259754836653,0.8600628437746395,0.590025690961065,0.16454521445416337,0.12948317561474498,0.5343643610113483,0.4778844190165301,0.6822426479338617,0.9082716460082859,0.1853294581490048,0.19134013571607666,0.1642069006398721,0.5128031250434972,0.2437968819631562,0.24623244590764515,0.47440059027702486]
+
+
 
 action world spider pos = let u0 = trace ("World and position are: " ++ show (world, pos)) map toInt (view world pos)
                               u = trace ("Build View" ++ show u0) fromList (3*reach) 1 u0
@@ -33,16 +39,16 @@ action world spider pos = let u0 = trace ("World and position are: " ++ show (wo
                                    | y > z = TurnRight
                                    | otherwise = Move
 
-defaultSpider :: Spider
-defaultSpider = [12,8,17,4,3,12,7,11,4,10,18,9,9,7,19,14,10,13,18, 10,15,20,20,2,3,18,17,1,1,19,6,1,10,16,4,5,2,15,7,1,13,18,5,20,2,13,5,12,13,15,4,14,13,12]
 
 simulateWorld :: Spider -> StateWithTime -> StateWithTime
-simulateWorld spider (StateWithTime t (SimState world pos))
-  = let n = simSpeed * floor t :: Int
-        newState = steps n world pos
+simulateWorld spider (StateWithTime t state)
+  = let n = floor t :: Int
+        newState = simulateSteps spider n state
         in StateWithTime (t - fromIntegral n) newState
-    where steps 0 world pos = SimState world pos
-          steps n world pos = let pos' = singleStep world spider pos in trace ("New position is: " ++ show pos') steps (n-1) world pos'
+
+simulateSteps :: Spider -> Int -> SimState -> SimState
+simulateSteps _ 0 state = state
+simulateSteps spider n (SimState world pos) = let pos' = singleStep world spider pos in simulateSteps spider (n-1) (SimState world pos')
 
 singleStep world spider pos = let ac = action world spider pos
                                   in trace ("Attempt action: " ++ show ac) change world ac pos
