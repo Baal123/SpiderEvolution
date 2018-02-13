@@ -36,25 +36,23 @@ addTime t (StateWithTime t' g) = StateWithTime (t+t') g
 data SimState = SimState World Position deriving(Show, Eq, Ord)
 spiderPosition (SimState _ (x,y,_)) = (fromIntegral x, fromIntegral y)
 goalPosition (SimState (World rows _ _) _ ) = let fields = concat $ mapWithIndex (\i row -> (mapWithIndex (\j cell -> ((i, j), cell)) row)) rows
-                                                  (x, y) = fst . head $ filter (\x -> snd x == Goal) fields
+                                                  (y, x) = fst . head $ filter (\x -> snd x == Goal) fields
                                                   in (fromIntegral x, fromIntegral y)
 
 initialState = SimState standardWorld startPosition
-startPosition = (xSize - 7, ySize - 7, ToRight)
+startPosition = (xSize - 5, ySize - 3, ToRight)
 standardWorld = World field xSize ySize
 field = [wall xSize,
          Wall:empty (xSize - 2) ++ [Wall],
-         Wall:Empty:Wall:empty (xSize -4) ++ [Wall],
-         Wall:Empty:Wall:empty (xSize -4) ++ [Wall],
-         Wall:Empty:Wall:empty (xSize -4) ++ [Wall],
-         Goal:Empty:Wall:empty (xSize -4) ++ [Wall],
-         Wall:Empty:Wall:empty (xSize -4) ++ [Wall],
-         Wall:Empty:Wall:empty (xSize -4) ++ [Wall],
-         Wall:Empty:Wall:empty (xSize -4) ++ [Wall],
+         Wall:Empty:Empty:empty (xSize -4) ++ [Wall],
+         Wall:Empty:Empty:empty (xSize -4) ++ [Wall],
+         Wall:Wall:Wall:empty (xSize -4) ++ [Wall],
+         Goal:Empty:Empty:empty (xSize -4) ++ [Wall],
+         Wall:Wall:Wall:empty (xSize -4) ++ [Wall],
          Wall:empty (xSize - 2) ++ [Wall],
          wall xSize]
 
-xSize = 16
+xSize = 10
 ySize = length field
 wall n = replicate n Wall
 empty n = replicate n Empty
