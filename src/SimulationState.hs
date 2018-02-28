@@ -46,9 +46,9 @@ field = [wall xSize,
          Wall:empty (xSize - 2) ++ [Wall],
          Wall:Empty:Empty:empty (xSize -4) ++ [Wall],
          Wall:Empty:Empty:empty (xSize -4) ++ [Wall],
-         Wall:Wall:Wall:empty (xSize -4) ++ [Wall],
-         Goal:Empty:Empty:empty (xSize -4) ++ [Wall],
-         Wall:Wall:Wall:empty (xSize -4) ++ [Wall],
+         Wall:Wall:Wall:Wall:empty (xSize -5) ++ [Wall],
+         Goal:Empty:Empty:Wall:empty (xSize -5) ++ [Wall],
+         Wall:Wall:Empty:Wall:empty (xSize -5) ++ [Wall],
          Wall:empty (xSize - 2) ++ [Wall],
          wall xSize]
 

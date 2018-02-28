@@ -44,14 +44,15 @@ extra-source-files:  ChangeLog.md
 
 -- Constraint on the version of Cabal needed to build this package.
 cabal-version:       >=1.10
+data-dir: src/Sprites
+data-files: Dungeon/*.png, LPC_Spiders/*.png
 
 
 executable SpiderEvolution
   -- .hs or .lhs file containing the Main module.
   main-is:             Main.hs
-
   -- Modules included in this executable, other than Main.
-  -- other-modules: Draw, Evolution, Simulation, SimulationState, Utilities
+  other-modules: Draw, Evolution, Simulation, SimulationState, Utilities, Paths_SpiderEvolution
 
   -- LANGUAGE extensions used by modules in this package.
   -- other-extensions:
@@ -62,7 +63,8 @@ executable SpiderEvolution
                        matrix,
                        gloss-juicy >= 0.2.2,
                        NoTrace,
-                       random >= 1.1
+                       random >= 1.1,
+                       MonadRandom >= 0.5.1
 
   -- Directories containing source files.
   hs-source-dirs:      src

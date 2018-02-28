@@ -5,6 +5,7 @@ import           Graphics.Gloss.Juicy
 import           Simulation
 import           SimulationState
 import           Utilities
+import           Paths_SpiderEvolution
 
 
 width = 400
@@ -22,11 +23,17 @@ fps = 4
 background :: Color
 background = greyN 0.5
 
-wallP = loadJuicyPNG "Sprites/Dungeon/Wall_42_42.png"
-spiderDP = loadJuicyPNG "Sprites/LPC_Spiders/Spider_Down_1.png"
-spiderLP = loadJuicyPNG "Sprites/LPC_Spiders/Spider_Left_1.png"
-spiderRP = loadJuicyPNG "Sprites/LPC_Spiders/Spider_Right_1.png"
-spiderTP = loadJuicyPNG "Sprites/LPC_Spiders/Spider_Top_1.png"
+wallPath = getDataFileName "Dungeon/Wall_42_42.png"
+spiderDPath = getDataFileName "LPC_Spiders/Spider_Down_1.png"
+spiderLPath = getDataFileName "LPC_Spiders/Spider_Left_1.png"
+spiderRPath = getDataFileName "LPC_Spiders/Spider_Right_1.png"
+spiderTPath = getDataFileName "LPC_Spiders/Spider_Top_1.png"
+
+wallP = loadJuicyPNG =<< wallPath
+spiderDP = loadJuicyPNG =<< spiderDPath
+spiderLP = loadJuicyPNG =<< spiderLPath
+spiderRP = loadJuicyPNG =<< spiderRPath
+spiderTP = loadJuicyPNG =<< spiderTPath
 
 data Sprites = Sprites {wall        :: Picture,
                         spiderDown  :: Picture,

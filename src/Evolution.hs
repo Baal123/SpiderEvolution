@@ -4,6 +4,7 @@ import SimulationState
 import System.Random
 import Data.List
 import Utilities
+import Control.Monad.Random.Strict
 
 -- Utility Methods
 update :: Int -> a -> [a] -> [a]
@@ -11,15 +12,11 @@ update _ _ [] = error "Index out of bound in update"
 update 0 a (x:xs) = a:xs
 update n a (x:xs) = x:update (n-1) a xs
 
-randomDouble :: Double -> Double -> IO Double
-randomDouble a b = let f g = fst $ randomR (a, b) g
-                       g = newStdGen
-                       in fmap f g
+randomDouble :: RandomGen g => Double -> Double -> Rand g Double
+randomDouble a b = getRandomR (a, b)
 
-randomInt :: Int -> Int -> IO Int
-randomInt a b = let f g = fst $ randomR (a, b) g
-                    in do g <- newStdGen
-                          return (f g)
+randomInt :: RandomGen g => Int -> Int -> Rand g Int
+randomInt a b = getRandomR (a, b)
 
 combineAt :: Int -> [a] -> [a] -> [a]
 combineAt i l r = take i l ++ drop i r
@@ -41,7 +38,7 @@ randomPop n = let f g = take chromosomes $ randomRs (-1, 1) g
 pair (x:y:xs) = (x,y):pair xs
 pair _ = []
 
-evolutionStep :: Population -> IO Population
+evolutionStep :: RandomGen g => Population -> Rand g Population
 evolutionStep pop = let n = length pop
                         pop' = take (n `div` 4) pop
                         f (s1, s2) = replicate 8 (pairSpiders s1 s2)
@@ -54,12 +51,12 @@ evolutionSteps 0 pop = return pop
 evolutionSteps n pop = evolutionStep pop >>= evolutionSteps (n-1)
 
 -- Aufgaben:
-mutateSpider :: Spider -> IO Spider
+mutateSpider :: RandomGen g => Spider -> Rand g Spider
 mutateSpider spider = do v <- randomDouble (-1) 1
                          i <- randomInt 0 (chromosomes - 1)
                          return (update i v spider)
 
-pairSpiders :: Spider -> Spider -> IO Spider
+pairSpiders :: RandomGen g => Spider -> Spider -> Rand g Spider
 pairSpiders spider1 spider2 = do i <- randomInt 0 (chromosomes - 1)
                                  return (combineAt i spider1 spider2)
 

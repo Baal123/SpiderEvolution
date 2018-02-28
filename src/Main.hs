@@ -7,6 +7,8 @@ import           SimulationState
 import           Utilities
 import           Evolution
 import           Draw
+import           System.Random
+import           Control.Monad.Random.Strict
 
 
 readInt :: IO Int
@@ -28,8 +30,9 @@ main = do putStrLn "Enter Population Size"
                          randomPop popSize
                  else do putStrLn "Use Default Poputlation"
                          defaultPop popSize
-          gen <- evolutionSteps n pop
-          let winner = head gen
+          g <- newStdGen
+          let gen = evalRand (evolutionSteps n pop) g
+              winner = head gen
               in do putStrLn "Show Winner"
                     print winner
                     showSpider winner
