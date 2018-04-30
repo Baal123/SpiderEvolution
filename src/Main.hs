@@ -9,6 +9,7 @@ import           Evolution
 import           Draw
 import           System.Random
 import           Control.Monad.Random.Strict
+import           Control.Monad(when)
 
 
 readInt :: IO Int
@@ -30,12 +31,32 @@ main = do putStrLn "Enter Population Size"
                          randomPop popSize
                  else do putStrLn "Use Default Poputlation"
                          defaultPop popSize
-          g <- newStdGen
-          let gen = evalRand (evolutionSteps n pop) g
-              winner = head gen
-              in do putStrLn "Show Winner"
-                    print winner
-                    showSpider winner
+          winner <- startSim pop n
+          putStrLn "Show Spider? (y)"
+          a' <- noNewLine
+          when (a' `elem` "yY") $ showSpider winner
 
+startSim :: Population -> Int -> IO Spider
+startSim pop n = do g <- newStdGen
+                    let gen = evalRand (evolutionSteps n pop) g
+                        winner = head gen
+                    putStrLn "Calc Winner"
+                    putStrLn $ "Fitness of winner is: " ++ show (fitness winner)
+                    putStrLn "Continue with current Population? (y)"
+                    a <- noNewLine -- for some reason newlines are thrown
+                    putStrLn  "Answer is:"
+                    print a
+                    if a `elem` "yY"
+                    then do putStrLn "How many Steps?"
+                            getChar -- for some reason newlines are thrown
+                            n' <- readInt
+                            startSim gen n'
+                    else do putStrLn "Return winner:"
+                            return winner
 
 isDigit x = x `elem` ['0','1','2','3','4','5','6','7','8','9']
+
+noNewLine :: IO Char
+noNewLine = do a <- getChar
+               if a == '\n' then noNewLine
+               else return a

@@ -24,8 +24,8 @@ combineAt i l r = take i l ++ drop i r
 -- Stuff
 type Population = [Spider]
 defaultPop :: Int -> IO Population
-defaultPop n = let m = min chromosomes n
-                   base = take m [replicate l (-1) ++ replicate (chromosomes - l) 1 | l <- [1..chromosomes]]
+defaultPop n = let m = max chromosomes n
+                   base = take m $ concatMap permutations [replicate l (-1) ++ replicate (chromosomes - l) 1 | l <- [1..chromosomes]]
                    rest = replicate (n-m) (replicate chromosomes 0)
                    pop = sortOn fitness (base ++ rest)
                    in return pop
@@ -45,7 +45,7 @@ evolutionStep pop = let n = length pop
                         children = mergeMonads $ concatMap f (pair pop')
                         in do nextGen <- children
                               nextGenM <- mergeMonads (map mutateSpider nextGen)
-                              return (take n $ sortOn fitness (nextGenM ++ pop)) -- do not regress
+                              return (take n $ sortOn fitness nextGenM) -- allow regression
 
 evolutionSteps 0 pop = return pop
 evolutionSteps n pop = evolutionStep pop >>= evolutionSteps (n-1)
@@ -60,9 +60,25 @@ pairSpiders :: RandomGen g => Spider -> Spider -> Rand g Spider
 pairSpiders spider1 spider2 = do i <- randomInt 0 (chromosomes - 1)
                                  return (combineAt i spider1 spider2)
 
-fitness :: Spider -> Double
-fitness spider = let endState = simulateSteps spider 30 initialState
-                     gP = goalPosition endState
-                     sP = spiderPosition endState
-                     metric (x1, x2) (y1, y2) = abs (x1 - y1) + abs (x2 - y2)
-                     in metric gP sP
+fitness1 :: Spider -> Double
+fitness1 spider = let state1 = simulateSteps spider 10 initialState
+                      state2 = simulateSteps spider 10 state1
+                      state3 = simulateSteps spider 10 state2
+                      sP1 = spiderPosition state1
+                      sp2 = spiderPosition state2
+                      sp3 = spiderPosition state3
+                      in  fromIntegral (norm sP1 + norm sP1 * 2 + norm sP1 * 3)
+
+fitness2 spider = let state1 = simulateSteps spider 30 initialState
+                      in fromIntegral $ norm (spiderPosition state1)
+
+fitness3 spider = let state = simulateSteps spider 30 initialState
+                      in metric1 goalPosition (spiderPosition state)
+
+fitness = fitness3
+
+norm p = if p `elem` innerField then metric1 p goalPosition
+         else 5 + metric1 p gatePosition
+metric1 (x1, x2) (y1, y2) = abs (x1 - y1) + abs (x2 - y2)
+gatePosition = (3, 7)
+innerField = [(0, 5), (1, 7), (1, 6), (1, 5), (2, 7), (2, 6), (2, 5), (3, 7)]
