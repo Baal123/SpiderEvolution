@@ -33,7 +33,7 @@ iLSize = 3*viewSize
 -- Spider Definition
 type Spider = [Double]
 type LayerDefinition = [Int]
-layerDefinition = [6, 3]
+layerDefinition = [3]
 chromosomes = f (iLSize:layerDefinition)
               where
                 f (x:y:xs) = x*y + f (y:xs)

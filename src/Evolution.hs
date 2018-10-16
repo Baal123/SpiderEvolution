@@ -1,5 +1,5 @@
 module Evolution where
-import Simulation
+import SimulationV2
 import SimulationState
 import System.Random
 import Data.List
@@ -51,8 +51,12 @@ evolutionSteps 0 pop = return pop
 evolutionSteps n pop = evolutionStep pop >>= evolutionSteps (n-1)
 
 -- Aufgaben:
+delta = 0.1
+grid = [s*i*delta | i <- [1..1/delta], s <- [-1, 1]]
+
 mutateSpider :: RandomGen g => Spider -> Rand g Spider
-mutateSpider spider = do v <- randomDouble (-1) 1
+mutateSpider spider = do j <- randomInt 0 (length grid - 1)
+                         let v = grid!!j
                          i <- randomInt 0 (chromosomes - 1)
                          return (update i v spider)
 

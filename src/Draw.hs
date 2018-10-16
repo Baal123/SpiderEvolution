@@ -2,7 +2,7 @@ module Draw(showSpider) where
 import           Data.Maybe
 import           Graphics.Gloss
 import           Graphics.Gloss.Juicy
-import           Simulation
+import           SimulationV2
 import           SimulationState
 import           Utilities
 import           Paths_SpiderEvolution

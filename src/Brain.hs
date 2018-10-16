@@ -43,6 +43,5 @@ simpleFeedFoward ws = sff ws []
                                             l = (w, inputDef)
                                             in sff ws (l:ls)
 
-
 -- Helper
 vector ls = fromList (length ls) 1 ls
